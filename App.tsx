@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Speaker, Message } from './types';
 
 const lessonDialogue: Message[] = [
@@ -73,15 +73,67 @@ const ChatMessage: React.FC<{ message: Message; onClick?: () => void }> = ({ mes
   );
 };
 
+const TrigonometryAnimation: React.FC = () => {
+    const [phase, setPhase] = useState(0);
+
+    useEffect(() => {
+        const timers = [
+            setTimeout(() => setPhase(1), 500),   // Plane and target appear
+            setTimeout(() => setPhase(2), 1500),  // Altitude line draws
+            setTimeout(() => setPhase(3), 2500),  // Distance line draws
+            setTimeout(() => setPhase(4), 3500),  // Hypotenuse and angle appear
+            setTimeout(() => setPhase(5), 4500),  // Formula appears
+        ];
+        return () => timers.forEach(clearTimeout);
+    }, []);
+
+    const baseClasses = "transition-all duration-1000 ease-in-out";
+
+    return (
+        <div className="relative w-full h-64 md:h-72 bg-gray-900 rounded-lg p-4 overflow-hidden border border-gray-600 my-4">
+            {/* Plane */}
+            <div className={`absolute top-4 left-8 text-4xl ${baseClasses} ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}>✈️</div>
+            
+            {/* Target */}
+            <div className={`absolute bottom-4 right-8 text-4xl ${baseClasses} ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}>🎯</div>
+
+            {/* Altitude Line */}
+            <div className="absolute left-12 top-16 flex flex-col items-center">
+                 <div className={`w-0.5 bg-yellow-300 origin-top ${baseClasses} ${phase >= 2 ? 'h-36' : 'h-0'}`}></div>
+                 <span className={`text-yellow-300 mt-2 ${baseClasses} ${phase >= 2 ? 'opacity-100' : 'opacity-0'}`}>고도 (Opposite)</span>
+            </div>
+
+            {/* Distance Line */}
+            <div className="absolute bottom-10 left-16 flex items-center">
+                <div className={`h-0.5 bg-cyan-300 origin-left ${baseClasses} ${phase >= 3 ? 'w-56 md:w-96' : 'w-0'}`}></div>
+                <span className={`text-cyan-300 ml-2 ${baseClasses} ${phase >= 3 ? 'opacity-100' : 'opacity-0'}`}>수평 거리 (Adjacent)</span>
+            </div>
+
+            {/* Hypotenuse */}
+            <svg className={`absolute top-0 left-0 w-full h-full ${baseClasses} ${phase >= 4 ? 'opacity-100' : 'opacity-0'}`} viewBox="0 0 400 200">
+                <line x1="55" y1="50" x2="350" y2="175" stroke="#f472b6" strokeWidth="2" strokeDasharray="8 4" />
+            </svg>
+
+            {/* Angle Arc */}
+            <div className={`absolute top-14 left-14 text-pink-400 text-2xl font-bold ${baseClasses} ${phase >= 4 ? 'opacity-100' : 'opacity-0'}`}>θ</div>
+
+            {/* Formula */}
+            <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 ${baseClasses} ${phase >= 5 ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="bg-gray-800 p-4 rounded-lg border border-gray-600 text-center">
+                    <code className="text-xl text-yellow-300 font-mono">tan(θ) = 고도 / 수평 거리</code>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 const KeyConcepts: React.FC = () => (
     <Section title="핵심 개념 및 요점">
         <div className="space-y-6">
             <div>
-                <h3 className="text-xl font-semibold text-white mb-2">핵심 공식</h3>
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-600">
-                    <code className="text-lg text-yellow-300 font-mono">tan(θ) = Opposite / Adjacent</code>
-                    <p className="text-gray-300 mt-2">tan(θ) = 고도 / 표적까지의 수평 거리</p>
-                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">핵심 공식 시각화</h3>
+                <TrigonometryAnimation />
                 <p className="text-gray-400 mt-3">이 간단한 삼각비는 조종사가 알려진 고도와 거리에서 목표물을 타격하는 데 필요한 정확한 공격 각도를 계산할 수 있게 해줍니다.</p>
             </div>
             <div>
